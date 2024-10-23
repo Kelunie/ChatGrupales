@@ -1,0 +1,67 @@
+/* Estilos para el botón de inicio de sesión */
+.btn-login {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+/* Estilos generales */
+body {
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.chat-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Estilos para el pie de página */
+footer {
+  background-color: #f8f9fa; /* Color de fondo suave */
+  color: #333; /* Color de texto */
+  padding: 20px 0; /* Espaciado vertical */
+  text-align: center; /* Centra el texto */
+  border-top: 2px solid #007bff; /* Línea superior azul */
+}
+
+footer .container {
+  max-width: 1200px; /* Ancho máximo para el contenido */
+  margin: auto; /* Centra el contenedor */
+}
+
+footer .text-muted {
+  font-size: 0.9rem; /* Tamaño de fuente más pequeño */
+}
+
+footer span {
+  display: block; /* Hace que cada línea se muestre en una nueva línea */
+  margin: 5px 0; /* Espaciado entre líneas */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  footer {
+    padding: 15px 0; /* Reduce el espaciado en pantallas más pequeñas */
+  }
+}
+
+option .diferente {
+  background-color: #000000; /* Color de fondo suave */
+  color: #333; /* Color de texto */
+  padding: 20px 0; /* Espaciado vertical */
+  text-align: center; /* Centra el texto */
+  border-top: 2px solid #007bff; /* Línea superior azul */
+}
+
+option :hover {
+  background-color: #000000; /* Color de fondo suave */
+  color: #333; /* Color de texto */
+  padding: 20px 0; /* Espaciado vertical */
+  text-align: center; /* Centra el texto */
+  border-top: 2px solid #007bff; /* Línea superior azul */
+}
