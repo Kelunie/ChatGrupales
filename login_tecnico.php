@@ -1,44 +1,48 @@
 <?php
-// Iniciar sesión para guardar el estado del usuario logueado
 session_start();
 
-// Incluir el archivo de conexión
+// Conectar a la base de datos
 include_once('codes/conexion.inc');
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Obtener datos del formulario
+// Inicializar variables
+$autenticacion_exitosa = false;
+$isAdmin = false;
+
+// Verificar si se enviaron los datos del formulario
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Consulta para verificar si el usuario existe
-    $sql = "SELECT * FROM tecnicos WHERE username = ?";
-    $stmt = $conex->prepare($sql);
+    // Consultar la base de datos para verificar las credenciales
+    $stmt = $conex->prepare("SELECT password FROM tecnicos WHERE username = ?"); // Cambiado de $conn a $conex
     $stmt->bind_param("s", $username);
     $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->store_result();
 
-    if ($result->num_rows > 0) {
-        // Obtener los datos del técnico
-        $row = $result->fetch_assoc();
+    // Verificar si se encontró un usuario
+    if ($stmt->num_rows > 0) {
+        $stmt->bind_result($hashed_password);
+        $stmt->fetch();
 
-        // Verificar la contraseña (suponiendo que esté cifrada con password_hash)
-        if (password_verify($password, $row['password'])) {
-            // Autenticación exitosa
-            $_SESSION['tecnico_id'] = $row['id'];
-            $_SESSION['tecnico_username'] = $row['username'];
-
-            // Redirigir a la página de tickets
-            header("Location: ver_tickets.php");
-            exit();
-        } else {
-            echo "Contraseña incorrecta.";
+        // Verificar la contraseña
+        if (password_verify($password, $hashed_password)) {
+            $autenticacion_exitosa = true;
         }
-    } else {
-        echo "Usuario no encontrado.";
     }
 
     $stmt->close();
 }
 
-$conex->close();
+// Manejar la respuesta de autenticación
+if ($autenticacion_exitosa) {
+    $_SESSION['tecnico'] = true;
+    $_SESSION['username'] = $username; // Guardar el nombre de usuario en la sesión
+    $_SESSION['is_admin'] = 1; // Indicar que el usuario es administrador
+    echo json_encode(['success' => true, 'redirect' => 'gestionar_tickets.php']);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Credenciales incorrectas']);
+}
+
+$conex->close(); // Cambiado de $conn a $conex
+exit;
 ?>
