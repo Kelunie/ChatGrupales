@@ -10,11 +10,9 @@
   </div>
   <script src="codes/js/bootstrap.bundle.min.js"></script>
   <!-- JS de Bootstrap -->
-  <script src="codes/js/chat.js"></script>
   <!-- Tu archivo JS -->
 </footer>
 
 <script src="codes/js/bootstrap.bundle.min.js"></script>
 <!-- JS de Bootstrap -->
-<script src="codes/js/chat.js"></script>
 <!-- Tu archivo JS -->

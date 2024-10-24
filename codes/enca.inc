@@ -30,8 +30,6 @@
   crossorigin="anonymous"
 ></script>
 
-<script src="codes/chat.js"></script>
-
 <!-- logo de la pagina -->
 <link rel="icon" href="codes/img/logo.png" />
 

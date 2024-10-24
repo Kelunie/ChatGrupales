@@ -65,3 +65,7 @@ option :hover {
   text-align: center; /* Centra el texto */
   border-top: 2px solid #007bff; /* Línea superior azul */
 }
+.btn-warning a {
+  text-decoration: none; /* Removes the underline */
+  color: inherit; /* Inherits the button's text color */
+}

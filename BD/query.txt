@@ -1,4 +1,4 @@
-mensajes
+/* mensajes */
 CREATE TABLE mensajes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_usuario VARCHAR(50),
@@ -7,7 +7,7 @@ CREATE TABLE mensajes (
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP   
 );
 
-tickets
+/* tickets */
 CREATE TABLE tickets (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_usuario VARCHAR(50),
@@ -16,7 +16,7 @@ CREATE TABLE tickets (
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-tecnicos
+/* tecnicos */
 CREATE TABLE tecnicos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -25,3 +25,6 @@ CREATE TABLE tecnicos (
 
 prueba
 INSERT INTO tecnicos (username, password) VALUES ('tecnico', 'password'); -- Cambia 'password' a una versión hasheada para mayor seguridad
+
+/* Creamos el apartado de la IP*/
+ALTER TABLE tickets ADD COLUMN ip_usuario VARCHAR(45);
