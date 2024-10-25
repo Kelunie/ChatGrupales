@@ -8,7 +8,7 @@ if (!isset($_SESSION['tecnico'])) {
 include_once('codes/conexion.inc');
 
 // Consulta para obtener los tickets abiertos
-$query = "SELECT id, nombre_usuario, mensaje, estado, fecha FROM tickets WHERE estado = 'abierto'";
+$query = "SELECT id, nombre_usuario, mensaje, estado, fecha, ip_usuario, nombre_equipo FROM tickets WHERE estado = 'abierto'";
 $result = $conex->query($query);
 
 ?>
@@ -78,7 +78,7 @@ $result = $conex->query($query);
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Usuario</th>
+                        <th>Activo (IP)</th>
                         <th>Mensaje</th>
                         <th>Estado</th>
                         <th>Fecha</th>
@@ -89,16 +89,23 @@ $result = $conex->query($query);
                     <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?= $row['id'] ?></td>
-                        <td><?= $row['nombre_usuario'] ?></td>
+                        <td><?= (!empty($row['nombre_equipo']) ? $row['nombre_equipo'] : 'Desconocido') . " (" . (!empty($row['ip_usuario']) ? $row['ip_usuario'] : 'IP desconocida') . ")" ?>
+                        </td>
                         <td><?= $row['mensaje'] ?></td>
                         <td><?= $row['estado'] ?></td>
                         <td><?= $row['fecha'] ?></td>
                         <td>
-                            <form action="aceptar_ticket.php" method="POST">
+                            <form action="aceptar_ticket.php" method="POST" target="_blank"
+                                style="display:inline-block;">
                                 <input type="hidden" name="ticket_id" value="<?= $row['id'] ?>">
                                 <button type="submit" class="btn btn-primary">Aceptar Ticket</button>
                             </form>
+
+                            <!-- Enlace para abrir el chat del ticket -->
+                            <a href="chat_ticket.php?ticket_id=<?= $row['id'] ?>" target="_blank"
+                                class="btn btn-info">Ver Chat</a>
                         </td>
+
                     </tr>
                     <?php endwhile; ?>
                 </tbody>

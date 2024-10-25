@@ -79,13 +79,39 @@
                 <option value="Odontología">Odontología</option>
                 <option value="Administración">Administración</option>
                 <option value="Redes">Redes</option>
-                <option value="Soporte TI">Soporte TI</option>
+                <option value="Soporte TI">CGI</option>
             </select>
             <button type="button" id="openModalBtn" class="btn btn-primary mt-4">Ingresar al chat</button>
         </div>
         <?php if (!isset($_SESSION['tecnico'])) : ?>
+        <!-- Botón para enviar un ticket de soporte -->
         <div class="container mt-4 text-center">
             <button type="button" id="openTicketBtn" class="btn btn-info">Enviar Ticket de Soporte</button>
+        </div>
+
+        <!-- Modal para enviar ticket de soporte -->
+        <div id="ticketModal" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Enviar Ticket de Soporte</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formEnviarTicket">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="nombreUsuario" name="nombreUsuario"
+                                    placeholder="Tu nombre" required>
+                            </div>
+                            <div class="mb-3">
+                                <textarea class="form-control" id="mensajeTicket" name="mensajeTicket" rows="3"
+                                    placeholder="Describe tu problema..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Enviar Ticket</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
         <?php endif;?>
         <br>
@@ -243,21 +269,47 @@
                 "&chat_grupo=" + encodeURIComponent(chatGrupo));
         });
 
-        // Abrir modal para enviar ticket de soporte
-        document.getElementById('openTicketBtn').onclick = function() {
-            document.getElementById("chatGrupo").value = "Soporte TI";
-            var nombreUsuario = document.getElementById("nombreUsuario").value;
+        // Abrir el modal de enviar ticket de soporte
+        document.getElementById('openTicketBtn').addEventListener('click', function() {
+            var ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
+            ticketModal.show();
+        });
 
-            if (validarNombreUsuario()) {
-                document.getElementById("nombreUsuarioModal").value = nombreUsuario;
-                document.getElementById("chatGrupoTitulo").innerText = "Ticket de Soporte";
+        // Manejar el envío del formulario para el ticket
+        document.getElementById('formEnviarTicket').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-                var chatModal = new bootstrap.Modal(document.getElementById('chatModal'));
-                chatModal.show();
-            } else {
-                alert("Por favor ingresa tu nombre.");
-            }
-        };
+            const nombreUsuario = document.getElementById('nombreUsuario').value;
+            const mensajeTicket = document.getElementById('mensajeTicket').value;
+
+            // Obtener IP del usuario
+            const ipUsuario = '<?php echo $_SERVER["REMOTE_ADDR"]; ?>';
+            const nombreEquipo = window.navigator.userAgent;
+
+            fetch('crear_ticket.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `nombre_usuario=${encodeURIComponent(nombreUsuario)}&mensaje=${encodeURIComponent(mensajeTicket)}&ip_usuario=${encodeURIComponent(ipUsuario)}&nombre_equipo=${encodeURIComponent(nombreEquipo)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Abrir una nueva pestaña con el chat del ticket
+                        const nuevaVentana = window.open('chat_ticket.php?ticket_id=' + data.ticket_id,
+                            '_blank');
+                        nuevaVentana.document.write(
+                            '<h1>No cerrar esta pestaña hasta que el Técnico de TI se lo indique</h1>');
+                        nuevaVentana.document.write('<div id="chat"></div>');
+                    } else {
+                        alert('Hubo un problema al enviar el ticket.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
         </script>
     </main>
 </body>
