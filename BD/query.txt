@@ -10,11 +10,14 @@ CREATE TABLE mensajes (
 /* tickets */
 CREATE TABLE tickets (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_usuario VARCHAR(50),
-    mensaje TEXT,
+    nombre_usuario VARCHAR(50) NOT NULL,
+    mensaje TEXT NOT NULL,
     estado ENUM('abierto', 'en proceso', 'cerrado') DEFAULT 'abierto',
-    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ip_usuario VARCHAR(50),  -- Campo para almacenar la IP
+    nombre_equipo VARCHAR(100)  -- Campo para almacenar el nombre del equipo
 );
+
 
 /* tecnicos */
 CREATE TABLE tecnicos (
@@ -22,6 +25,16 @@ CREATE TABLE tecnicos (
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL
 );
+/* */
+CREATE TABLE mensajes_ticket (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ticket_id INT NOT NULL,  -- Referencia al ticket
+    nombre_usuario VARCHAR(50) NOT NULL,
+    mensaje TEXT NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ticket_id) REFERENCES tickets(id)
+);
+
 
 prueba
 INSERT INTO tecnicos (username, password) VALUES ('tecnico', 'password'); -- Cambia 'password' a una versión hasheada para mayor seguridad
