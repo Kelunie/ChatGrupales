@@ -9,7 +9,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nombre_usuario = $_POST['nombre_usuario'] ?? '';
     $mensaje = $_POST['mensaje'] ?? '';
     $ip_usuario = $_SERVER['REMOTE_ADDR']; // Obtiene la IP del usuario
-    $nombre_equipo = $_POST['nombre_equipo'] ?? ''; // Asegúrate de que este valor se envíe
+
+    // Intenta recuperar el nombre del equipo
+    $nombre_equipo = gethostbyaddr($ip_usuario);
+    if ($nombre_equipo === $ip_usuario) {
+        $nombre_equipo = 'Nombre no disponible'; // Valor por defecto si no se puede obtener
+    }
 
     // Prepara y ejecuta la consulta para guardar el ticket en la base de datos
     $query = "INSERT INTO tickets (nombre_usuario, mensaje, estado, ip_usuario, nombre_equipo) VALUES (?, ?, 'abierto', ?, ?)";

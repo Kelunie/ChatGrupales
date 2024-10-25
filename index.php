@@ -324,6 +324,39 @@
                         console.error('Error:', error);
                     });
             });
+            // Manejar el envío del formulario para enviar mensajes
+            document.getElementById('formEnviarMensaje').addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevenir el envío normal del formulario
+
+                const nombreUsuario = document.getElementById('nombreUsuarioModal').value;
+                const mensaje = document.getElementById('mensaje').value;
+                const chatGrupo = document.getElementById('chatGrupo').value;
+                const nombreEquipo = document.getElementById('nombreEquipo').value; // Campo para el nombre del equipo
+
+                fetch('enviar_mensaje.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `nombre_usuario=${encodeURIComponent(nombreUsuario)}&mensaje=${encodeURIComponent(mensaje)}&chat_grupo=${encodeURIComponent(chatGrupo)}&nombre_equipo=${encodeURIComponent(nombreEquipo)}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Muestra el mensaje en el historial de mensajes
+                            const historialMensajes = document.getElementById("historialMensajes");
+                            historialMensajes.innerHTML +=
+                                `<p><strong>${data.nombre_usuario}:</strong> ${data.mensaje}</p>`;
+                            // Limpia el campo del mensaje
+                            document.getElementById('mensaje').value = '';
+                        } else {
+                            alert('Error al enviar el mensaje: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
         </script>
     </main>
 </body>
