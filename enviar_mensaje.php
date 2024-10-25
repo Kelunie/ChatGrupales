@@ -8,14 +8,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $query = "INSERT INTO mensajes (nombre_usuario, mensaje, chat_grupo) VALUES (?, ?, ?)";
     $stmt = $conex->prepare($query);
-    $stmt->bind_param("sss", $nombre_usuario, $mensaje, $chat_grupo);
-    $stmt->execute();
+
+    if ($stmt) {
+        $stmt->bind_param("sss", $nombre_usuario, $mensaje, $chat_grupo);
+        $stmt->execute();
+
+        // Respuesta JSON de éxito
+        echo json_encode([
+            'success' => true,
+            'nombre_usuario' => $nombre_usuario,
+            'mensaje' => $mensaje
+        ]);
+    } else {
+        // Respuesta JSON de error
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error en la consulta SQL.'
+        ]);
+    }
 
     $stmt->close();
     $conex->close();
-    
-    // Redirigir de vuelta al chat después de enviar el mensaje
-    header("Location: index.php");
-    exit();
+} else {
+    // Respuesta JSON de error para solicitudes no POST
+    echo json_encode([
+        'success' => false,
+        'message' => 'Método no permitido.'
+    ]);
 }
-?>

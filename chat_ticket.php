@@ -2,9 +2,8 @@
 session_start();
 include_once('codes/conexion.inc');
 
-// Obtener la IP del usuario
-$ip_usuario = $_SERVER['REMOTE_ADDR'];
-$ticket_id = $_GET['ticket_id'];
+// Obtener el ID del ticket de la URL
+$ticket_id = $_GET['ticket_id'] ?? 0;
 
 // Consulta para obtener los detalles del ticket
 $query = "SELECT * FROM tickets WHERE id = ?";
@@ -19,14 +18,10 @@ if (!$ticket) {
     exit;
 }
 
-// Verificar que el usuario que creó el ticket o un técnico asignado pueda ver el ticket
-if ($ticket['ip_usuario'] !== $ip_usuario && !isset($_SESSION['tecnico_id'])) {
-    echo "No tienes permiso para ver este ticket.";
-    exit;
-}
-
-// Mostrar el chat del ticket
+// Guardar el nombre del usuario que creó el ticket
+$usuarioTicket = $ticket['nombre_usuario']; // Asumiendo que hay un campo 'nombre_usuario' en la tabla 'tickets'
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -47,11 +42,12 @@ if ($ticket['ip_usuario'] !== $ip_usuario && !isset($_SESSION['tecnico_id'])) {
 
 <body>
     <h1>Chat del Ticket #<?php echo $ticket_id; ?></h1>
-    <div id="chat"></div>
+    <div id="chat">
+        <!-- Aquí se mostrarán los mensajes -->
+    </div>
 
     <form id="formEnviarMensaje">
-        <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
-        <input type="text" id="mensaje" name="mensaje" placeholder="Escribe tu mensaje" required>
+        <textarea id="mensaje" placeholder="Escribe tu mensaje..." required></textarea>
         <button type="submit">Enviar</button>
     </form>
 
@@ -59,8 +55,13 @@ if ($ticket['ip_usuario'] !== $ip_usuario && !isset($_SESSION['tecnico_id'])) {
         // Función para cargar los mensajes del ticket
         function cargarMensajes() {
             const chatDiv = document.getElementById('chat');
-            fetch('obtener_mensajes_ticket.php?ticket_id=<?php echo $ticket_id; ?>')
-                .then(response => response.json())
+            fetch('obtener_mensaje_ticket.php?ticket_id=<?php echo $ticket_id; ?>') // Ajusta la ruta si es necesario
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la carga de mensajes.');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     chatDiv.innerHTML = '';
                     data.mensajes.forEach(mensaje => {
@@ -68,23 +69,35 @@ if ($ticket['ip_usuario'] !== $ip_usuario && !isset($_SESSION['tecnico_id'])) {
                             `<p><strong>${mensaje.nombre_usuario}:</strong> ${mensaje.mensaje}</p>`;
                     });
                     chatDiv.scrollTop = chatDiv.scrollHeight; // Desplazar hacia el final del chat
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                 });
         }
 
+        // Cargar los mensajes al cargar la página
+        cargarMensajes();
         // Cargar los mensajes periódicamente
         setInterval(cargarMensajes, 5000);
 
-        // Enviar nuevo mensaje
+        // Manejar el envío del formulario para enviar un mensaje
         document.getElementById('formEnviarMensaje').addEventListener('submit', function(e) {
             e.preventDefault();
             const mensaje = document.getElementById('mensaje').value;
+
+            // Definir el nombre del usuario según si es técnico o no
+            <?php if (isset($_SESSION['tecnico'])): ?>
+                const nombreUsuario = '<?php echo $_SESSION['username']; ?>';
+            <?php else: ?>
+                const nombreUsuario = '<?php echo $usuarioTicket; ?>'; // Usar el nombre del usuario que envió el ticket
+            <?php endif; ?>
 
             fetch('enviar_mensaje_ticket.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: `ticket_id=<?php echo $ticket_id; ?>&mensaje=${encodeURIComponent(mensaje)}`
+                    body: `ticket_id=<?php echo $ticket_id; ?>&nombre_usuario=${encodeURIComponent(nombreUsuario)}&mensaje=${encodeURIComponent(mensaje)}`
                 }).then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -93,6 +106,8 @@ if ($ticket['ip_usuario'] !== $ip_usuario && !isset($_SESSION['tecnico_id'])) {
                     } else {
                         alert('Hubo un error al enviar el mensaje.');
                     }
+                }).catch(error => {
+                    console.error('Error:', error);
                 });
         });
     </script>
