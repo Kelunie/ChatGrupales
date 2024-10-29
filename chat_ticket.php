@@ -35,12 +35,46 @@ $usuarioTicket = $ticket['nombre_usuario']; // Asumiendo que hay un campo 'nombr
     <title><?php echo $titulo; ?></title> <!-- Usa el título dinámico -->
     <link rel="stylesheet" href="path/to/bootstrap.css">
     <style>
-    #chat {
-        height: 400px;
-        overflow-y: scroll;
-        border: 1px solid #ccc;
-        padding: 10px;
-    }
+        #chat {
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+
+        }
+
+        .boton {
+            border: none;
+            color: black;
+            padding: 14px 28px;
+            cursor: pointer;
+            border-radius: 200px;
+            display: inline-flex;
+            width: 100%;
+            height: 50%;
+            font-size: 20px;
+            font-optical-sizing: none;
+        }
+
+        .boton i {
+            margin-right: 5px;
+            margin-left: 5px;
+            margin-top: 4.5px;
+        }
+
+        .resuelto {
+            background-color: #04AA6D;
+        }
+
+        .resuelto:hover {
+            background-color: #46a049;
+        }
+
+        .separador {
+            /* vamos a agregar una linea negra para cada vez que llega un mensaje para diferenciarlos*/
+            border-bottom: 1px solid black;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 
@@ -52,7 +86,16 @@ $usuarioTicket = $ticket['nombre_usuario']; // Asumiendo que hay un campo 'nombr
     <main>
         <div class="container ">
             <header>
-                <h1 class="text-center">Chat del Ticket #<?php echo $ticket_id; ?></h1>
+                <h1 class="text-center">Chat del Ticket #<?php echo $ticket_id; ?> ||
+                    <?php if (isset($_SESSION['tecnico'])) : ?>
+                        <form action="cerrado_ticket.php" method="POST" style="display:inline-block;">
+                            <input type="hidden" name="ticket_id" value="<?= $ticket_id ?>">
+                            <button class="boton resuelto" type="submit">
+                                Caso resuelto <i class="fas fa-check-circle"></i>
+                            </button>
+                        </form>
+                    <?php endif; ?>
+                </h1>
                 <div id="chat">
                     <!-- Aquí se mostrarán los mensajes -->
                 </div>
@@ -73,67 +116,67 @@ $usuarioTicket = $ticket['nombre_usuario']; // Asumiendo que hay un campo 'nombr
                     <?php include_once('codes/pie.inc'); ?>
                 </footer>
                 <script>
-                // Función para cargar los mensajes del ticket
-                function cargarMensajes() {
-                    const chatDiv = document.getElementById('chat');
-                    fetch(
-                            'obtener_mensaje_ticket.php?ticket_id=<?php echo $ticket_id; ?>'
-                        ) // Ajusta la ruta si es necesario
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Error en la carga de mensajes.');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            chatDiv.innerHTML = '';
-                            data.mensajes.forEach(mensaje => {
-                                chatDiv.innerHTML +=
-                                    `<p><strong>${mensaje.nombre_usuario}:</strong> ${mensaje.mensaje}</p>`;
+                    // Función para cargar los mensajes del ticket
+                    function cargarMensajes() {
+                        const chatDiv = document.getElementById('chat');
+                        fetch(
+                                'obtener_mensaje_ticket.php?ticket_id=<?php echo $ticket_id; ?>'
+                            ) // Ajusta la ruta si es necesario
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Error en la carga de mensajes.');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                chatDiv.innerHTML = '';
+                                data.mensajes.forEach(mensaje => {
+                                    chatDiv.innerHTML +=
+                                        `<p class="separador"><strong>${mensaje.nombre_usuario}:</strong><br>  ${mensaje.mensaje}</p>`;
+                                });
+                                chatDiv.scrollTop = chatDiv.scrollHeight; // Desplazar hacia el final del chat
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
                             });
-                            chatDiv.scrollTop = chatDiv.scrollHeight; // Desplazar hacia el final del chat
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                }
+                    }
 
-                // Cargar los mensajes al cargar la página
-                cargarMensajes();
-                // Cargar los mensajes periódicamente
-                setInterval(cargarMensajes, 5000);
+                    // Cargar los mensajes al cargar la página
+                    cargarMensajes();
+                    // Cargar los mensajes periódicamente
+                    setInterval(cargarMensajes, 5000);
 
-                // Manejar el envío del formulario para enviar un mensaje
-                document.getElementById('formEnviarMensaje').addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const mensaje = document.getElementById('mensaje').value;
+                    // Manejar el envío del formulario para enviar un mensaje
+                    document.getElementById('formEnviarMensaje').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const mensaje = document.getElementById('mensaje').value;
 
-                    // Definir el nombre del usuario según si es técnico o no
-                    <?php if (isset($_SESSION['tecnico'])): ?>
-                    const nombreUsuario = '<?php echo $_SESSION['username']; ?>';
-                    <?php else: ?>
-                    const nombreUsuario = '<?php echo $usuarioTicket; ?>';
-                    <?php endif; ?>
+                        // Definir el nombre del usuario según si es técnico o no
+                        <?php if (isset($_SESSION['tecnico'])): ?>
+                            const nombreUsuario = '<?php echo $_SESSION['username']; ?>';
+                        <?php else: ?>
+                            const nombreUsuario = '<?php echo $usuarioTicket; ?>';
+                        <?php endif; ?>
 
-                    fetch('enviar_mensaje_ticket.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: `ticket_id=<?php echo $ticket_id; ?>&nombre_usuario=${encodeURIComponent(nombreUsuario)}&mensaje=${encodeURIComponent(mensaje)}`
-                        }).then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                document.getElementById('mensaje').value =
-                                    ''; // Limpiar el campo de mensaje
-                                cargarMensajes(); // Recargar los mensajes
-                            } else {
-                                alert('Hubo un error al enviar el mensaje.');
-                            }
-                        }).catch(error => {
-                            console.error('Error:', error);
-                        });
-                });
+                        fetch('enviar_mensaje_ticket.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: `ticket_id=<?php echo $ticket_id; ?>&nombre_usuario=${encodeURIComponent(nombreUsuario)}&mensaje=${encodeURIComponent(mensaje)}`
+                            }).then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    document.getElementById('mensaje').value =
+                                        ''; // Limpiar el campo de mensaje
+                                    cargarMensajes(); // Recargar los mensajes
+                                } else {
+                                    alert('Hubo un error al enviar el mensaje.');
+                                }
+                            }).catch(error => {
+                                console.error('Error:', error);
+                            });
+                    });
                 </script>
             </header>
         </div>

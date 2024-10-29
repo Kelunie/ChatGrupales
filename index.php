@@ -250,7 +250,7 @@
         }
 
         // Manejar el envío del formulario para el ticket
-        document.getElementById('formEnviarTicket').addEventListener('submit', function(e) {
+        /* document.getElementById('formEnviarTicket').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const nombreUsuario = document.getElementById('nombreUsuario').value;
@@ -283,7 +283,7 @@
                 .catch(error => {
                     console.error('Error:', error);
                 });
-        });
+        }); */
 
 
 
@@ -317,11 +317,11 @@
                         // Abrir una nueva pestaña con el chat del ticket
                         const nuevaVentana = window.open('chat_ticket.php?ticket_id=' + data.ticket_id,
                             '_blank');
-                        nuevaVentana.document.write(
-                            '<h1>No cerrar esta pestaña hasta que el Técnico de TI se lo indique</h1>');
-                        nuevaVentana.document.write('<div id="chat"></div>');
+                        // Limpiar los campos del formulario
+                        document.getElementById('nombreUsuario').value = '';
+                        document.getElementById('mensajeTicket').value = '';
                     } else {
-                        alert('Hubo un problema al enviar el ticket.');
+                        alert('Hubo un problema al enviar el ticket: ' + data.message);
                     }
                 })
                 .catch(error => {

@@ -16,14 +16,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($username && $password) {
         // Preparar la consulta para verificar las credenciales
-        $stmt = $conex->prepare("SELECT password FROM tecnicos WHERE username = ?");
+        $stmt = $conex->prepare("SELECT password, id FROM tecnicos WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $stmt->store_result();
 
         // Verificar si se encontró un usuario y comprobar la contraseña
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($hashed_password);
+            // Vinculamos la contraseña hasheada y la ID del técnico
+            $stmt->bind_result($hashed_password, $tecnico_id);
             $stmt->fetch();
 
             if (password_verify($password, $hashed_password)) {
@@ -31,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['tecnico'] = true;
                 $_SESSION['username'] = $username;
                 $_SESSION['is_admin'] = 1; // Indicar que el usuario es administrador
+                $_SESSION['tecnico_id'] = $tecnico_id; // Almacenar la id del técnico en la sesión
                 $mensaje = ''; // Sin mensaje de error si la autenticación es exitosa
             }
         }
