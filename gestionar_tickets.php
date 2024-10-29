@@ -8,7 +8,7 @@ if (!isset($_SESSION['tecnico'])) {
 include_once('codes/conexion.inc');
 
 // Consulta para obtener los tickets abiertos
-$query = "SELECT id, nombre_usuario, mensaje, estado, fecha, ip_usuario, nombre_equipo FROM tickets WHERE estado = 'abierto'";
+$query = "SELECT id, nombre_usuario, mensaje, estado, fecha, ip_usuario, nombre_equipo FROM tickets";
 $result = $conex->query($query);
 
 ?>
@@ -20,36 +20,36 @@ $result = $conex->query($query);
     <title>Gestión de Tickets</title>
     <link rel="stylesheet" href="codes/css/bootstrap.min.css" />
     <?php if ($_SERVER['PHP_SELF'] == '/gestionar_tickets.php'): ?>
-    <title>Gestión de tickets</title>
+        <title>Gestión de tickets</title>
     <?php else: ?>
-    <title>Chat Grupales CCSS</title>
+        <title>Chat Grupales CCSS</title>
     <?php endif; ?>
 
     <style>
-    .btn-warning a {
-        text-decoration: none;
-        /* Removes the underline */
-        color: inherit;
-        /* Inherits the button's text color */
-    }
+        .btn-warning a {
+            text-decoration: none;
+            /* Removes the underline */
+            color: inherit;
+            /* Inherits the button's text color */
+        }
 
-    /* Agregaremos que brille el boton con hover*/
-    .btn-warning :hover {
-        background-color: #f8b400;
-        border-color: #f8b400;
-    }
+        /* Agregaremos que brille el boton con hover*/
+        .btn-warning :hover {
+            background-color: #f8b400;
+            border-color: #f8b400;
+        }
 
-    .btn-warning a :hover {
-        background-color: #f8b400;
-        border-color: #f8b400;
-    }
+        .btn-warning a :hover {
+            background-color: #f8b400;
+            border-color: #f8b400;
+        }
 
-    .btn-info a {
-        text-decoration: none;
-        /* Removes the underline */
-        color: inherit;
-        /* Inherits the button's text color */
-    }
+        .btn-info a {
+            text-decoration: none;
+            /* Removes the underline */
+            color: inherit;
+            /* Inherits the button's text color */
+        }
     </style>
 
 </head>
@@ -69,43 +69,43 @@ $result = $conex->query($query);
 
             <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                 <?php if ($result->num_rows > 0): ?>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Activo (IP)</th>
-                            <th>Mensaje</th>
-                            <th>Estado</th>
-                            <th>Fecha</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td><?= $row['id'] ?></td>
-                            <td><?= (!empty($row['nombre_equipo']) ? $row['nombre_equipo'] : 'Desconocido') . " (" . (!empty($row['ip_usuario']) ? $row['ip_usuario'] : 'IP desconocida') . ")" ?>
-                            </td>
-                            <td><?= $row['mensaje'] ?></td>
-                            <td><?= $row['estado'] ?></td>
-                            <td><?= $row['fecha'] ?></td>
-                            <td>
-                                <form action="aceptar_ticket.php" method="POST" target="_blank"
-                                    style="display:inline-block;">
-                                    <input type="hidden" name="ticket_id" value="<?= $row['id'] ?>">
-                                    <button type="submit" class="btn btn-primary">Aceptar Ticket</button>
-                                </form>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Activo (IP)</th>
+                                <th>Mensaje</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while ($row = $result->fetch_assoc()): ?>
+                                <tr>
+                                    <td><?= $row['id'] ?></td>
+                                    <td><?= (!empty($row['nombre_equipo']) ? $row['nombre_equipo'] : 'Desconocido') . " (" . (!empty($row['ip_usuario']) ? $row['ip_usuario'] : 'IP desconocida') . ")" ?>
+                                    </td>
+                                    <td><?= $row['mensaje'] ?></td>
+                                    <td><?= $row['estado'] ?></td>
+                                    <td><?= $row['fecha'] ?></td>
+                                    <td>
+                                        <form action="aceptar_ticket.php" method="POST" target="_blank"
+                                            style="display:inline-block;">
+                                            <input type="hidden" name="ticket_id" value="<?= $row['id'] ?>">
+                                            <button type="submit" class="btn btn-primary">Aceptar Ticket</button>
+                                        </form>
 
-                                <!-- Enlace para abrir el chat del ticket -->
-                                <a href="chat_ticket.php?ticket_id=<?= $row['id'] ?>" target="_blank"
-                                    class="btn btn-info">Ver Chat</a>
-                            </td>
-                        </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
+                                        <!-- Enlace para abrir el chat del ticket -->
+                                        <a href="chat_ticket.php?ticket_id=<?= $row['id'] ?>" target="_blank"
+                                            class="btn btn-info">Ver Chat</a>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
                 <?php else: ?>
-                <p>No hay tickets abiertos.</p>
+                    <p>No hay tickets abiertos.</p>
                 <?php endif; ?>
             </div>
         </div>

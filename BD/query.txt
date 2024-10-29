@@ -1,4 +1,4 @@
-/* mensajes */
+/* tabla para mannejar los mensajes de los grupos*/
 CREATE TABLE mensajes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_usuario VARCHAR(50),
@@ -7,7 +7,7 @@ CREATE TABLE mensajes (
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP   
 );
 
-/* tickets */
+/* tabla para la creacion de tickets */
 CREATE TABLE tickets (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_usuario VARCHAR(50) NOT NULL,
@@ -19,13 +19,14 @@ CREATE TABLE tickets (
 );
 
 
-/* tecnicos */
+/* tabla para la creacion de tecnicos */
 CREATE TABLE tecnicos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL
 );
-/* */
+
+/* Tabla para manejar los mensajes de cada ticket, tiene de FK a ticket(id)*/
 CREATE TABLE mensajes_ticket (
     id INT AUTO_INCREMENT PRIMARY KEY,
     ticket_id INT NOT NULL,  -- Referencia al ticket
@@ -36,8 +37,8 @@ CREATE TABLE mensajes_ticket (
 );
 
 
-prueba
-INSERT INTO tecnicos (username, password) VALUES ('tecnico', 'password'); -- Cambia 'password' a una versión hasheada para mayor seguridad
 
-/* Creamos el apartado de la IP*/
-ALTER TABLE tickets ADD COLUMN ip_usuario VARCHAR(45);
+/* creamos apartado para el tecnico asignado usando la la tabla tickets y tecnicos*/
+ALTER TABLE tickets
+ADD COLUMN tecnico_asignado INT NULL,
+ADD FOREIGN KEY (tecnico_asignado) REFERENCES tecnicos(id);

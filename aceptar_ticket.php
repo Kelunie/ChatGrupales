@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
+
     <div class="container text-center">
         <h1>No cerrar esta pestaña hasta que el Técnico de TI se lo indique</h1>
         <h2>Chat con <?= $nombre_usuario ?></h2>
@@ -38,54 +39,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script>
-        // Función para cargar el historial de mensajes
-        function cargarHistorialChat() {
-            fetch('cargar_historial_chat.php?ticket_id=<?= $ticket_id ?>')
-                .then(response => response.json()) // Aquí estás esperando un JSON
-                .then(data => {
-                    if (data.error) {
-                        console.error(data.error);
-                        return;
-                    }
+    // Función para cargar el historial de mensajes
+    function cargarHistorialChat() {
+        fetch('cargar_historial_chat.php?ticket_id=<?= $ticket_id ?>')
+            .then(response => response.json()) // Aquí estás esperando un JSON
+            .then(data => {
+                if (data.error) {
+                    console.error(data.error);
+                    return;
+                }
 
-                    let chatHtml = '';
-                    data.forEach(mensaje => {
-                        chatHtml +=
-                            `<p><strong>${mensaje.nombre_usuario}</strong>: ${mensaje.mensaje} <br><small>${mensaje.fecha}</small></p>`;
-                    });
+                let chatHtml = '';
+                data.forEach(mensaje => {
+                    chatHtml +=
+                        `<p><strong>${mensaje.nombre_usuario}</strong>: ${mensaje.mensaje} <br><small>${mensaje.fecha}</small></p>`;
+                });
 
-                    document.getElementById('chat').innerHTML = chatHtml;
-                })
-                .catch(error => console.error('Error al cargar el chat:', error));
-        }
+                document.getElementById('chat').innerHTML = chatHtml;
+            })
+            .catch(error => console.error('Error al cargar el chat:', error));
+    }
 
-        // Actualizar el historial del chat cada 5 segundos
-        setInterval(cargarHistorialChat, 5000);
+    // Actualizar el historial del chat cada 5 segundos
+    setInterval(cargarHistorialChat, 5000);
 
-        // Enviar mensaje con AJAX
-        document.getElementById('formEnviarMensaje').addEventListener('submit', function(e) {
-            e.preventDefault();
+    // Enviar mensaje con AJAX
+    document.getElementById('formEnviarMensaje').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-            const mensaje = document.getElementById('mensaje').value;
+        const mensaje = document.getElementById('mensaje').value;
 
-            fetch('enviar_mensaje_chat.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: `ticket_id=<?= $ticket_id ?>&mensaje=${encodeURIComponent(mensaje)}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('mensaje').value = ''; // Limpiar el campo de texto
-                        cargarHistorialChat(); // Actualizar el historial después de enviar el mensaje
-                    } else {
-                        alert('Error al enviar el mensaje.');
-                    }
-                })
-                .catch(error => console.error('Error al enviar mensaje:', error));
-        });
+        fetch('enviar_mensaje_chat.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `ticket_id=<?= $ticket_id ?>&mensaje=${encodeURIComponent(mensaje)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('mensaje').value = ''; // Limpiar el campo de texto
+                    cargarHistorialChat(); // Actualizar el historial después de enviar el mensaje
+                } else {
+                    alert('Error al enviar el mensaje.');
+                }
+            })
+            .catch(error => console.error('Error al enviar mensaje:', error));
+    });
     </script>
 
 </body>
