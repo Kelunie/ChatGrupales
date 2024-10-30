@@ -24,20 +24,20 @@ $result = $conex->query($query);
     <title>Gestión de Tickets</title>
     <link rel="stylesheet" href="codes/css/bootstrap.min.css" />
     <style>
-    .btn-warning a {
-        text-decoration: none;
-        color: inherit;
-    }
+        .btn-warning a {
+            text-decoration: none;
+            color: inherit;
+        }
 
-    .btn-warning:hover {
-        background-color: #f8b400;
-        border-color: #f8b400;
-    }
+        .btn-warning:hover {
+            background-color: #f8b400;
+            border-color: #f8b400;
+        }
 
-    .btn-info a {
-        text-decoration: none;
-        color: inherit;
-    }
+        .btn-info a {
+            text-decoration: none;
+            color: inherit;
+        }
     </style>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -58,44 +58,49 @@ $result = $conex->query($query);
 
             <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                 <?php if ($result->num_rows > 0): ?>
-                <table class="display" id="tablaTickets">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Activo (IP)</th>
-                            <th>Mensaje</th>
-                            <th>Estado</th>
-                            <th>Fecha</th>
-                            <th>Técnico Asignado</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td><?= $row['id'] ?></td>
-                            <td><?= (!empty($row['nombre_equipo']) ? $row['nombre_equipo'] : 'Desconocido') . " (" . (!empty($row['ip_usuario']) ? $row['ip_usuario'] : 'IP desconocida') . ")" ?>
-                            </td>
-                            <td><?= $row['mensaje'] ?></td>
-                            <td><?= $row['estado'] ?></td>
-                            <td><?= $row['fecha'] ?></td>
-                            <td><?= $row['tecnico_asignado'] ?: 'Sin asignar' ?></td>
-                            <td>
-                                <form action="aceptar_ticket.php" method="POST" target="_blank"
-                                    style="display:inline-block;">
-                                    <input type="hidden" name="ticket_id" value="<?= $row['id'] ?>">
-                                    <button type="submit" class="btn btn-primary">Aceptar Ticket</button>
-                                </form>
+                    <table class="display" id="tablaTickets">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Activo (IP)</th>
+                                <th>Mensaje</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Técnico Asignado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while ($row = $result->fetch_assoc()): ?>
+                                <tr>
+                                    <td><?= $row['id'] ?></td>
+                                    <td><?= (!empty($row['nombre_equipo']) ? $row['nombre_equipo'] : 'Desconocido') . " (" . (!empty($row['ip_usuario']) ? $row['ip_usuario'] : 'IP desconocida') . ")" ?>
+                                    </td>
+                                    <td><?= $row['mensaje'] ?></td>
+                                    <td><?= $row['estado'] ?></td>
+                                    <td><?= $row['fecha'] ?></td>
+                                    <td><?= $row['tecnico_asignado'] ?: 'Sin asignar' ?></td>
+                                    <td>
+                                        <?php if (empty($row['tecnico_asignado'])): // Verificar si no hay técnico asignado 
+                                        ?>
+                                            <form action="aceptar_ticket.php" method="POST" id="aceptarTicketForm_<?= $row['id'] ?>"
+                                                style="display:inline-block;">
+                                                <input type="hidden" name="ticket_id" value="<?= $row['id'] ?>">
+                                                <button type="submit" class="btn btn-primary">Aceptar Ticket</button>
+                                            </form>
+                                        <?php else: ?>
+                                            <button class="btn btn-secondary" disabled>Aceptar Ticket</button>
+                                        <?php endif; ?>
 
-                                <a href="chat_ticket.php?ticket_id=<?= $row['id'] ?>" target="_blank"
-                                    class="btn btn-info">Ver Chat</a>
-                            </td>
-                        </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
+                                        <a href="chat_ticket.php?ticket_id=<?= $row['id'] ?>" target="_blank"
+                                            class="btn btn-info">Ver Chat</a>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
                 <?php else: ?>
-                <p>No hay tickets abiertos.</p>
+                    <p>No hay tickets abiertos.</p>
                 <?php endif; ?>
             </div>
         </div>
@@ -105,24 +110,43 @@ $result = $conex->query($query);
         <?php include_once('codes/pie.inc'); ?>
     </footer>
     <script>
-    $(document).ready(function() {
-        $('#tablaTickets').DataTable();
-    });
-    </script>
-    <script>
-    let ultimoNumeroTickets = 0;
+        $(document).ready(function() {
+            $('#tablaTickets').DataTable();
 
-    function cargarTickets() {
-        fetch('obtener_tickets.php')
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                const tabla = document.getElementById('tablaTickets').getElementsByTagName('tbody')[0];
-                tabla.innerHTML = ''; // Limpiar la tabla
+            // Manejar el envío de formularios para aceptar tickets
+            $('form[id^="aceptarTicketForm_"]').on('submit', function(event) {
+                event.preventDefault(); // Evita el envío del formulario tradicional
 
-                data.forEach(ticket => {
-                    const fila = document.createElement('tr');
-                    fila.innerHTML = `
+                const form = $(this); // Guarda la referencia al formulario
+                $.ajax({
+                    url: form.attr('action'), // Obtiene la URL del atributo action del formulario
+                    type: 'POST',
+                    data: form.serialize(), // Serializa los datos del formulario
+                    success: function(response) {
+                        alert("Ticket aceptado");
+                        // Recarga la página para reflejar los cambios
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Hubo un error al aceptar el ticket: " + error);
+                    }
+                });
+            });
+        });
+
+        let ultimoNumeroTickets = 0;
+
+        function cargarTickets() {
+            fetch('obtener_tickets.php')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    const tabla = document.getElementById('tablaTickets').getElementsByTagName('tbody')[0];
+                    tabla.innerHTML = ''; // Limpiar la tabla
+
+                    data.forEach(ticket => {
+                        const fila = document.createElement('tr');
+                        fila.innerHTML = `
                     <td>${ticket.id}</td>
                     <td>${ticket.nombre_equipo || 'Desconocido'} (${ticket.ip_usuario || 'IP desconocida'})</td>
                     <td>${ticket.mensaje}</td>
@@ -130,33 +154,29 @@ $result = $conex->query($query);
                     <td>${ticket.fecha}</td>
                     <td>${ticket.username || 'Sin asignar'}</td>
                     <td>
-                        <form action="aceptar_ticket.php" method="POST" target="_blank" style="display:inline-block;">
+                        ${!ticket.username ? `
+                        <form action="aceptar_ticket.php" method="POST" id="aceptarTicketForm_${ticket.id}" style="display:inline-block;">
                             <input type="hidden" name="ticket_id" value="${ticket.id}">
                             <button type="submit" class="btn btn-primary">Aceptar Ticket</button>
-                        </form>
+                        </form>` : `<button class="btn btn-secondary" disabled>Aceptar Ticket</button>`}
                         <a href="chat_ticket.php?ticket_id=${ticket.id}" target="_blank" class="btn btn-info">Ver Chat</a>
                     </td>
                 `;
-                    tabla.appendChild(fila);
+                        tabla.appendChild(fila);
+                    });
+
+                    // Actualizar el número de tickets
+                    ultimoNumeroTickets = data.length;
+                })
+                .catch(error => {
+                    console.error('Error al cargar los tickets:', error);
+                    alert('Error al cargar los tickets. Por favor, intenta de nuevo más tarde.');
                 });
+        }
 
-                // Reproducir sonido si hay un nuevo ticket
-                /* if (data.length > ultimoNumeroTickets) {
-                     document.getElementById('sonidoNuevoTicket').play();
-                } */
-
-                // Actualizar el número de tickets
-                ultimoNumeroTickets = data.length;
-            })
-            .catch(error => {
-                console.error('Error al cargar los tickets:', error);
-                alert('Error al cargar los tickets. Por favor, intenta de nuevo más tarde.');
-            });
-    }
-
-    // Cargar los tickets cada 10 segundos
-    cargarTickets();
-    setInterval(cargarTickets, 30000);
+        // Cargar los tickets cada 10 segundos
+        cargarTickets();
+        setInterval(cargarTickets, 30000);
     </script>
 </body>
 

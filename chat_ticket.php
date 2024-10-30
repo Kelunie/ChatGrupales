@@ -18,9 +18,11 @@ if (!$ticket) {
     exit;
 }
 
-// Guardar el nombre del usuario que creó el ticket
-$usuarioTicket = $ticket['nombre_usuario']; // Asumiendo que hay un campo 'nombre_usuario' en la tabla 'tickets'
+// Guardar el nombre del usuario que creó el ticket y el ID del técnico asignado
+$usuarioTicket = $ticket['nombre_usuario'];
+$tecnicoAsignado = $ticket['tecnico_asignado']; // ID del técnico asignado al ticket
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -87,10 +89,13 @@ $usuarioTicket = $ticket['nombre_usuario']; // Asumiendo que hay un campo 'nombr
         <div class="container ">
             <header>
                 <h1 class="text-center">Chat del Ticket #<?php echo $ticket_id; ?> ||
-                    <?php if (isset($_SESSION['tecnico'])) : ?>
+                    <!-- la siguiente codigo de php lo que hace es ver si el tecnico que esta viendo el chat
+                     es el mismo de que esta asignado el ticket, de no ser asi, el boton no funcionarara -->
+                    <?php if (isset($_SESSION['tecnico_id'])) : ?>
                         <form action="cerrado_ticket.php" method="POST" style="display:inline-block;">
                             <input type="hidden" name="ticket_id" value="<?= $ticket_id ?>">
-                            <button class="boton resuelto" type="submit">
+                            <button class="boton resuelto" type="submit"
+                                <?php if ($_SESSION['tecnico_id'] != $tecnicoAsignado) echo 'disabled'; ?>>
                                 Caso resuelto <i class="fas fa-check-circle"></i>
                             </button>
                         </form>
@@ -116,42 +121,31 @@ $usuarioTicket = $ticket['nombre_usuario']; // Asumiendo que hay un campo 'nombr
                     <?php include_once('codes/pie.inc'); ?>
                 </footer>
                 <script>
-                    // Función para cargar los mensajes del ticket
+                    // funcion para cargar mensaje
                     function cargarMensajes() {
                         const chatDiv = document.getElementById('chat');
-                        fetch(
-                                'obtener_mensaje_ticket.php?ticket_id=<?php echo $ticket_id; ?>'
-                            ) // Ajusta la ruta si es necesario
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Error en la carga de mensajes.');
-                                }
-                                return response.json();
-                            })
+                        fetch('obtener_mensaje_ticket.php?ticket_id=<?php echo $ticket_id; ?>')
+                            .then(response => response.json())
                             .then(data => {
                                 chatDiv.innerHTML = '';
                                 data.mensajes.forEach(mensaje => {
                                     chatDiv.innerHTML +=
                                         `<p class="separador"><strong>${mensaje.nombre_usuario}:</strong><br>  ${mensaje.mensaje}</p>`;
                                 });
-                                chatDiv.scrollTop = chatDiv.scrollHeight; // Desplazar hacia el final del chat
+                                chatDiv.scrollTop = chatDiv.scrollHeight;
                             })
                             .catch(error => {
                                 console.error('Error:', error);
                             });
                     }
 
-                    // Cargar los mensajes al cargar la página
                     cargarMensajes();
-                    // Cargar los mensajes periódicamente
                     setInterval(cargarMensajes, 5000);
-
-                    // Manejar el envío del formulario para enviar un mensaje
+                    //manejar envio del formulario
                     document.getElementById('formEnviarMensaje').addEventListener('submit', function(e) {
                         e.preventDefault();
                         const mensaje = document.getElementById('mensaje').value;
 
-                        // Definir el nombre del usuario según si es técnico o no
                         <?php if (isset($_SESSION['tecnico'])): ?>
                             const nombreUsuario = '<?php echo $_SESSION['username']; ?>';
                         <?php else: ?>
@@ -167,9 +161,8 @@ $usuarioTicket = $ticket['nombre_usuario']; // Asumiendo que hay un campo 'nombr
                             }).then(response => response.json())
                             .then(data => {
                                 if (data.success) {
-                                    document.getElementById('mensaje').value =
-                                        ''; // Limpiar el campo de mensaje
-                                    cargarMensajes(); // Recargar los mensajes
+                                    document.getElementById('mensaje').value = '';
+                                    cargarMensajes();
                                 } else {
                                     alert('Hubo un error al enviar el mensaje.');
                                 }
