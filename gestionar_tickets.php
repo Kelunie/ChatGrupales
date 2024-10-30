@@ -56,7 +56,7 @@ $result = $conex->query($query);
         <div class="container-md">
             <h1>Tickets de Soporte</h1>
 
-            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+            <div class="table-responsive" style="max-height: auto; overflow-y: auto;">
                 <?php if ($result->num_rows > 0): ?>
                     <table class="display" id="tablaTickets">
                         <thead>
@@ -91,7 +91,6 @@ $result = $conex->query($query);
                                         <?php else: ?>
                                             <button class="btn btn-secondary" disabled>Aceptar Ticket</button>
                                         <?php endif; ?>
-
                                         <a href="chat_ticket.php?ticket_id=<?= $row['id'] ?>" target="_blank"
                                             class="btn btn-info">Ver Chat</a>
                                     </td>
@@ -109,23 +108,70 @@ $result = $conex->query($query);
     <footer>
         <?php include_once('codes/pie.inc'); ?>
     </footer>
+
     <script>
         $(document).ready(function() {
-            $('#tablaTickets').DataTable();
+            let dataTable = $('#tablaTickets').DataTable({
+                "pageLength": 5
+            });
 
-            // Manejar el envío de formularios para aceptar tickets
-            $('form[id^="aceptarTicketForm_"]').on('submit', function(event) {
-                event.preventDefault(); // Evita el envío del formulario tradicional
+            // Cargar y actualizar los tickets cada 30 segundos
+            function cargarTickets() {
+                fetch('obtener_tickets.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        const tabla = document.getElementById('tablaTickets').getElementsByTagName('tbody')[0];
+                        tabla.innerHTML = ''; // Limpiar la tabla
 
-                const form = $(this); // Guarda la referencia al formulario
+                        data.forEach(ticket => {
+                            const fila = document.createElement('tr');
+                            fila.innerHTML = `
+                                <td>${ticket.id}</td>
+                                <td>${ticket.nombre_equipo || 'Desconocido'} (${ticket.ip_usuario || 'IP desconocida'})</td>
+                                <td>${ticket.mensaje}</td>
+                                <td>${ticket.estado}</td>
+                                <td>${ticket.fecha}</td>
+                                <td>${ticket.username || 'Sin asignar'}</td>
+                                <td>
+                                    ${!ticket.username ? `
+                                    <form action="aceptar_ticket.php" method="POST" id="aceptarTicketForm_${ticket.id}" style="display:inline-block;">
+                                        <input type="hidden" name="ticket_id" value="${ticket.id}">
+                                        <button type="submit" class="btn btn-primary">Aceptar Ticket</button>
+                                    </form>` : `<button class="btn btn-secondary" disabled>Aceptar Ticket</button>`}
+                                    <a href="chat_ticket.php?ticket_id=${ticket.id}" target="_blank" class="btn btn-info">Ver Chat</a>
+                                </td>
+                            `;
+                            tabla.appendChild(fila);
+                        });
+
+                        // Destruir y volver a inicializar DataTable
+                        dataTable.destroy();
+                        dataTable = $('#tablaTickets').DataTable({
+                            "pageLength": 5
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar los tickets:', error);
+                        alert('Error al cargar los tickets. Por favor, intenta de nuevo más tarde.');
+                    });
+            }
+
+            // Intervalo para recargar los tickets cada 30 segundos
+            cargarTickets();
+            setInterval(cargarTickets, 30000);
+
+            // Manejo del envío del formulario para aceptar tickets mediante AJAX
+            $(document).on('submit', 'form[id^="aceptarTicketForm_"]', function(event) {
+                event.preventDefault();
+
+                const form = $(this);
                 $.ajax({
-                    url: form.attr('action'), // Obtiene la URL del atributo action del formulario
+                    url: form.attr('action'),
                     type: 'POST',
-                    data: form.serialize(), // Serializa los datos del formulario
+                    data: form.serialize(),
                     success: function(response) {
                         alert("Ticket aceptado");
-                        // Recarga la página para reflejar los cambios
-                        location.reload();
+                        cargarTickets(); // Recargar los tickets para reflejar el cambio
                     },
                     error: function(xhr, status, error) {
                         alert("Hubo un error al aceptar el ticket: " + error);
@@ -133,50 +179,6 @@ $result = $conex->query($query);
                 });
             });
         });
-
-        let ultimoNumeroTickets = 0;
-
-        function cargarTickets() {
-            fetch('obtener_tickets.php')
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    const tabla = document.getElementById('tablaTickets').getElementsByTagName('tbody')[0];
-                    tabla.innerHTML = ''; // Limpiar la tabla
-
-                    data.forEach(ticket => {
-                        const fila = document.createElement('tr');
-                        fila.innerHTML = `
-                    <td>${ticket.id}</td>
-                    <td>${ticket.nombre_equipo || 'Desconocido'} (${ticket.ip_usuario || 'IP desconocida'})</td>
-                    <td>${ticket.mensaje}</td>
-                    <td>${ticket.estado}</td>
-                    <td>${ticket.fecha}</td>
-                    <td>${ticket.username || 'Sin asignar'}</td>
-                    <td>
-                        ${!ticket.username ? `
-                        <form action="aceptar_ticket.php" method="POST" id="aceptarTicketForm_${ticket.id}" style="display:inline-block;">
-                            <input type="hidden" name="ticket_id" value="${ticket.id}">
-                            <button type="submit" class="btn btn-primary">Aceptar Ticket</button>
-                        </form>` : `<button class="btn btn-secondary" disabled>Aceptar Ticket</button>`}
-                        <a href="chat_ticket.php?ticket_id=${ticket.id}" target="_blank" class="btn btn-info">Ver Chat</a>
-                    </td>
-                `;
-                        tabla.appendChild(fila);
-                    });
-
-                    // Actualizar el número de tickets
-                    ultimoNumeroTickets = data.length;
-                })
-                .catch(error => {
-                    console.error('Error al cargar los tickets:', error);
-                    alert('Error al cargar los tickets. Por favor, intenta de nuevo más tarde.');
-                });
-        }
-
-        // Cargar los tickets cada 10 segundos
-        cargarTickets();
-        setInterval(cargarTickets, 30000);
     </script>
 </body>
 
