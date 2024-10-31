@@ -33,8 +33,21 @@
 <!-- logo de la pagina -->
 <link rel="icon" href="codes/img/logo.png" />
 
-<!-- nombre de la pagina -->
-<title>Chat Grupales CCSS</title>
+<!-- Colocar nombre de la página dinámicamente -->
+<?php 
+$page = basename($_SERVER['SCRIPT_NAME']); // Obtiene el nombre del archivo actual
+
+if ($page == "gestionar_tickets.php") {
+    echo "<title>Tickets</title>";
+} elseif ($page == "chat_ticket.php" && isset($_GET['ticket_id'])) {
+    $ticketId = htmlspecialchars($_GET['ticket_id']); // Sanitiza el ID del ticket para seguridad
+    echo "<title>Soporte</title>";
+} else {
+    echo "<title>Chat Grupales CCSS</title>";
+}
+?>
+
+
 
 <! -- font -->
 <link
