@@ -1,14 +1,8 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light">
   <div class="container-fluid">
     <!-- Logo que redirige al index -->
-    <a class="navbar-brand" href="index.php">
-      <img
-        src="codes/img/logo.png"
-        alt="Logo"
-        width="40"
-        height="40"
-        class="d-inline-block align-text-top"
-      />
+    <a class="navbar-brand menuti" href="index.php">
+      <img src="codes/img/logo.png" alt="Logo" width="40" height="40" />
       CCSS Orotina-San Mateo
     </a>
 

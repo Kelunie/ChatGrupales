@@ -34,10 +34,89 @@
         }
 
         .modal-perso {
-            max-width: 90%;
+            max-width: 50%;
             /* Ajusta el ancho al 90% de la pantalla */
-            height: 90%;
+            height: 100%;
             /* Ajusta la altura al 90% de la altura de la ventana */
+        }
+
+        body {
+            background-image: url("../ChatGrupales/codes/img/fondo.jpg");
+            /* Ruta actualizada desde la raíz del servidor */
+            background-size: cover;
+            /* Asegura que la imagen cubra toda la pantalla */
+            background-repeat: no-repeat;
+            /* Evita que la imagen se repita */
+            background-attachment: fixed;
+            /* Hace que la imagen de fondo se mantenga fija al hacer scroll */
+            background-position: center;
+            /* Centra la imagen en la página */
+        }
+
+        footer {
+            background-color: black;
+            /* Color de fondo suave */
+            color: white;
+            /* Color de texto */
+            padding: 20px 0;
+            /* Espaciado vertical */
+            text-align: center;
+            /* Centra el texto */
+            border-top: 2px solid gold;
+            /* Línea superior azul */
+        }
+
+        .btn-gold {
+            background-color: gold;
+            /* Fondo dorado */
+            color: black;
+            /* Letra negra */
+            border: 1px solid gold;
+            /* Borde del mismo color */
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.375rem;
+            /* Bordes redondeados */
+            transition: background-color 0.3s ease, color 0.3s ease;
+            /* Transiciones suaves */
+            position: relative;
+            top: -13px;
+        }
+
+        .btn-gold:hover {
+            background-color: white;
+            /* Fondo blanco en hover */
+            color: black;
+            /* Letra negra */
+            border: 1px solid black;
+            /* Borde negro en hover */
+        }
+
+
+        .mi-btn2 {
+            border: 1px;
+            border-radius: 50%;
+            background-color: gold;
+        }
+
+        .mi-btn2:hover {
+            background-color: white;
+            color: black;
+        }
+
+        .menuti {
+            color: gold;
+        }
+
+        .menuti:hover {
+            color: white;
+        }
+
+        .separador {
+            /* vamos a agregar una linea negra para cada vez que llega un mensaje para diferenciarlos*/
+            border-bottom: 1px solid black;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -63,7 +142,7 @@
     <!-- Botón para iniciar sesión como técnico -->
     <?php if (!isset($_SESSION['tecnico'])) : ?>
         <div class="container text-center mt-4">
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#loginModal">
+            <button type="button" class="mi-btn2" data-bs-toggle="modal" data-bs-target="#loginModal">
                 Iniciar sesión como Técnico
             </button>
         </div>
@@ -71,7 +150,7 @@
 
     <main>
         <div class="container mt-4 text-center">
-            <h1>Bienvenid@</h1>
+            <h1 style=color:white>Bienvenid@</h1>
         </div>
 
         <div class="container mt-4 text-center">
@@ -89,7 +168,7 @@
                 <option value="Redes">Redes</option>
                 <option value="Soporte TI">CGI</option>
             </select>
-            <button type="button" id="openModalBtn" class="btn btn-primary mt-4">Ingresar al chat</button>
+            <button type="button" id="openModalBtn" class="mi-boton btn btn-gold mt-4">Ingresar al chat</button>
         </div>
         <?php if (!isset($_SESSION['tecnico'])) : ?>
             <!-- Botón para enviar un ticket de soporte -->
@@ -317,10 +396,12 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Muestra el mensaje en el historial de mensajes
+                            // Muestra el mensaje en el historial de mensajes con hora
                             const historialMensajes = document.getElementById("historialMensajes");
+                            const fechaActual = new Date()
+                                .toLocaleString(); // Obtener la fecha y hora actual en formato local
                             historialMensajes.innerHTML +=
-                                `<p><strong>${data.nombre_usuario}:</strong> ${data.mensaje}</p>`;
+                                `<p class= "separador"><strong>${data.nombre_usuario}</strong> (${fechaActual}): <br> ${data.mensaje}</p>`;
                             // Limpia el campo del mensaje
                             document.getElementById('mensaje').value = '';
                             // Desplazarse al final del historial de mensajes

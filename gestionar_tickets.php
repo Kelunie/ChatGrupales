@@ -26,18 +26,142 @@ $result = $conex->query($query);
     <style>
         .btn-warning a {
             text-decoration: none;
+            /* Removes the underline */
             color: inherit;
+            /* Inherits the button's text color */
         }
 
-        .btn-warning:hover {
+        /* Agregaremos que brille el boton con hover*/
+        .btn-warning :hover {
+            background-color: #f8b400;
+            border-color: #f8b400;
+        }
+
+        .btn-warning a :hover {
             background-color: #f8b400;
             border-color: #f8b400;
         }
 
         .btn-info a {
             text-decoration: none;
+            /* Removes the underline */
             color: inherit;
+            /* Inherits the button's text color */
         }
+
+        .modal-perso {
+            max-width: 90%;
+            /* Ajusta el ancho al 90% de la pantalla */
+            height: 90%;
+            /* Ajusta la altura al 90% de la altura de la ventana */
+        }
+
+        body {
+            background-image: url("../ChatGrupales/codes/img/file.png");
+            /* Ruta actualizada desde la raíz del servidor */
+            background-size: cover;
+            /* Asegura que la imagen cubra toda la pantalla */
+            background-repeat: no-repeat;
+            /* Evita que la imagen se repita */
+            background-attachment: fixed;
+            /* Hace que la imagen de fondo se mantenga fija al hacer scroll */
+            background-position: center;
+            /* Centra la imagen en la página */
+        }
+
+        footer {
+            background-color: black;
+            /* Color de fondo suave */
+            color: white;
+            /* Color de texto */
+            padding: 20px 0;
+            /* Espaciado vertical */
+            text-align: center;
+            /* Centra el texto */
+            border-top: 2px solid gold;
+            /* Línea superior azul */
+        }
+
+        .btn-gold {
+            background-color: gold;
+            /* Fondo dorado */
+            color: black;
+            /* Letra negra */
+            border: 1px solid gold;
+            /* Borde del mismo color */
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.375rem;
+            /* Bordes redondeados */
+            transition: background-color 0.3s ease, color 0.3s ease;
+            /* Transiciones suaves */
+
+        }
+
+        .btn-gold:hover {
+            background-color: white;
+            /* Fondo blanco en hover */
+            color: black;
+            /* Letra negra */
+            border: 1px solid black;
+            /* Borde negro en hover */
+        }
+
+
+        .mi-btn2 {
+            border: 1px;
+            border-radius: 50%;
+            background-color: gold;
+        }
+
+        .mi-btn2:hover {
+            background-color: white;
+            color: black;
+        }
+
+        .menuti {
+            color: gold;
+        }
+
+        .menuti:hover {
+            color: white;
+        }
+
+        .tablitadinamica {
+            background-color: white;
+            color: black;
+        }
+
+        /* 
+        .tablita {
+            color: gold;
+            background-color: black;
+            border-color: white;
+            border: white, 1px;
+        }
+
+        .filitas {
+            color: gold;
+            background-color: black;
+        }
+
+        .tablitadinamica {
+            background-color: white;
+            color: gold;
+        }
+
+        /* Cambiar el color del texto que indica la cantidad de entradas mostradas */
+        /* 
+        .dataTables_info {
+            color: gold;
+            /* Cambiar a azul (puedes elegir el color que desees) */
+        /* } 
+
+        .dataTables_filter label {
+            color: black;
+        }
+        */
     </style>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -54,33 +178,34 @@ $result = $conex->query($query);
 
     <main>
         <div class="container-md">
-            <h1>Tickets de Soporte</h1>
+            <h1 style="color: gold;">Tickets de Soporte</h1>
 
-            <div class="table-responsive" style="max-height: auto; overflow-y: auto;">
+            <div class="table-responsive tablitadinamica" style="max-height: auto; overflow-y: auto;">
                 <?php if ($result->num_rows > 0): ?>
                     <table class="display" id="tablaTickets">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Activo (IP)</th>
-                                <th>Mensaje</th>
-                                <th>Estado</th>
-                                <th>Fecha</th>
-                                <th>Técnico Asignado</th>
-                                <th>Acción</th>
+                                <th class="filitas">ID</th>
+                                <th class="filitas">Activo (IP)</th>
+                                <th class="filitas">Mensaje</th>
+                                <th class="filitas">Estado</th>
+                                <th class="filitas">Fecha</th>
+                                <th class="filitas">Técnico Asignado</th>
+                                <th class="filitas">Acción</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="tablita">
                             <?php while ($row = $result->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?= $row['id'] ?></td>
-                                    <td><?= (!empty($row['nombre_equipo']) ? $row['nombre_equipo'] : 'Desconocido') . " (" . (!empty($row['ip_usuario']) ? $row['ip_usuario'] : 'IP desconocida') . ")" ?>
+                                <tr class="filitas">
+                                    <td style="color: black;"><?= $row['id'] ?></td>
+                                    <td class="filitas">
+                                        <?= (!empty($row['nombre_equipo']) ? $row['nombre_equipo'] : 'Desconocido') . " (" . (!empty($row['ip_usuario']) ? $row['ip_usuario'] : 'IP desconocida') . ")" ?>
                                     </td>
-                                    <td><?= $row['mensaje'] ?></td>
-                                    <td><?= $row['estado'] ?></td>
-                                    <td><?= $row['fecha'] ?></td>
-                                    <td><?= $row['tecnico_asignado'] ?: 'Sin asignar' ?></td>
-                                    <td>
+                                    <td class="filitas"><?= $row['mensaje'] ?></td>
+                                    <td class="filitas"><?= $row['estado'] ?></td>
+                                    <td class="filitas"><?= $row['fecha'] ?></td>
+                                    <td class="filitas"><?= $row['tecnico_asignado'] ?: 'Sin asignar' ?></td>
+                                    <td class="filitas">
                                         <?php if (empty($row['tecnico_asignado'])): // Verificar si no hay técnico asignado 
                                         ?>
                                             <form action="aceptar_ticket.php" method="POST" id="aceptarTicketForm_<?= $row['id'] ?>"
@@ -89,7 +214,7 @@ $result = $conex->query($query);
                                                 <button type="submit" class="btn btn-primary">Aceptar Ticket</button>
                                             </form>
                                         <?php else: ?>
-                                            <button class="btn btn-secondary" disabled>Aceptar Ticket</button>
+                                            <button class="btn btn-gold" disabled>Aceptar Ticket</button>
                                         <?php endif; ?>
                                         <a href="chat_ticket.php?ticket_id=<?= $row['id'] ?>" target="_blank"
                                             class="btn btn-info">Ver Chat</a>
