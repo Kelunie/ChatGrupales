@@ -40,9 +40,10 @@ $tecnicoAsignado = $ticket['tecnico_asignado']; // ID del técnico asignado al t
         #chat {
             height: 400px;
             overflow-y: scroll;
-            border: 1px solid #ccc;
+            border: 1px solid black;
             padding: 10px;
-
+            background-color: white;
+            border-radius: 20px;
         }
 
         .boton {
@@ -77,6 +78,83 @@ $tecnicoAsignado = $ticket['tecnico_asignado']; // ID del técnico asignado al t
             border-bottom: 1px solid black;
             margin-bottom: 10px;
         }
+
+        body {
+            background-image: url("../ChatGrupales/codes/img/file.png");
+            /* Ruta actualizada desde la raíz del servidor */
+            background-size: cover;
+            /* Asegura que la imagen cubra toda la pantalla */
+            background-repeat: no-repeat;
+            /* Evita que la imagen se repita */
+            background-attachment: fixed;
+            /* Hace que la imagen de fondo se mantenga fija al hacer scroll */
+            background-position: center;
+            /* Centra la imagen en la página */
+        }
+
+        footer {
+            background-color: black;
+            /* Color de fondo suave */
+            color: white;
+            /* Color de texto */
+            padding: 20px 0;
+            /* Espaciado vertical */
+            text-align: center;
+            /* Centra el texto */
+            border-top: 2px solid gold;
+            /* Línea superior azul */
+        }
+
+        .btn-gold {
+            background-color: gold;
+            /* Fondo dorado */
+            color: black;
+            /* Letra negra */
+            border: 1px solid gold;
+            /* Borde del mismo color */
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.375rem;
+            /* Bordes redondeados */
+            transition: background-color 0.3s ease, color 0.3s ease;
+            /* Transiciones suaves */
+
+        }
+
+        .btn-gold:hover {
+            background-color: white;
+            /* Fondo blanco en hover */
+            color: black;
+            /* Letra negra */
+            border: 1px solid black;
+            /* Borde negro en hover */
+        }
+
+
+        .mi-btn2 {
+            border: 1px;
+            border-radius: 50%;
+            background-color: gold;
+        }
+
+        .mi-btn2:hover {
+            background-color: white;
+            color: black;
+        }
+
+        .menuti {
+            color: gold;
+        }
+
+        .menuti:hover {
+            color: white;
+        }
+
+        .tablitadinamica {
+            background-color: white;
+            color: black;
+        }
     </style>
 </head>
 
@@ -88,13 +166,13 @@ $tecnicoAsignado = $ticket['tecnico_asignado']; // ID del técnico asignado al t
     <main>
         <div class="container ">
             <header>
-                <h1 class="text-center">Chat del Ticket #<?php echo $ticket_id; ?> ||
+                <h1 style="color: gold;" class="text-center">Chat del Ticket #<?php echo $ticket_id; ?> ||
                     <!-- la siguiente codigo de php lo que hace es ver si el tecnico que esta viendo el chat
                      es el mismo de que esta asignado el ticket, de no ser asi, el boton no funcionarara -->
                     <?php if (isset($_SESSION['tecnico_id'])) : ?>
                         <form action="cerrado_ticket.php" method="POST" style="display:inline-block;">
                             <input type="hidden" name="ticket_id" value="<?= $ticket_id ?>">
-                            <button class="boton resuelto" type="submit"
+                            <button class="btn btn-gold" type="submit"
                                 <?php if ($_SESSION['tecnico_id'] != $tecnicoAsignado) echo 'disabled'; ?>>
                                 Caso resuelto <i class="fas fa-check-circle"></i>
                             </button>
@@ -111,15 +189,12 @@ $tecnicoAsignado = $ticket['tecnico_asignado']; // ID del técnico asignado al t
                             placeholder="Dinos en que podemos ayudarte hoy..." required></textarea>
                     </div>
                     <div class="d-grid">
-                        <button class="btn btn-outline-primary btn-lg btn-block" type="submit">Enviar</button>
+                        <button class="btn btn-gold btn-lg btn-block" type="submit">Enviar</button>
                     </div>
                 </form>
 
                 <br>
 
-                <footer>
-                    <?php include_once('codes/pie.inc'); ?>
-                </footer>
                 <script>
                     // funcion para cargar mensaje
                     function cargarMensajes() {
@@ -173,6 +248,9 @@ $tecnicoAsignado = $ticket['tecnico_asignado']; // ID del técnico asignado al t
                 </script>
             </header>
         </div>
+        <footer>
+            <?php include_once('codes/pie.inc'); ?>
+        </footer>
     </main>
 </body>
 

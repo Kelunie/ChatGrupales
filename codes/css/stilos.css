@@ -5,29 +5,21 @@
   right: 20px;
 }
 
-/* Estilos generales */
-body {
-  background-color: #f8f9fa;
-  background-image: "codes/img/fondo.jpg";
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-
 .chat-container {
   text-align: center;
   margin-top: 20px;
 }
+.menuti {
+  color: gold;
+}
 
 /* Estilos para el pie de página */
 footer {
-  background-color: #f8f9fa; /* Color de fondo suave */
-  color: #333; /* Color de texto */
+  background-color: black; /* Color de fondo suave */
+  color: white; /* Color de texto */
   padding: 20px 0; /* Espaciado vertical */
   text-align: center; /* Centra el texto */
-  border-top: 2px solid #007bff; /* Línea superior azul */
+  border-top: 2px solid gold; /* Línea superior azul */
 }
 
 footer .container {
@@ -36,7 +28,7 @@ footer .container {
 }
 
 footer .text-muted {
-  font-size: 0.9rem; /* Tamaño de fuente más pequeño */
+  font-size: 10rem; /* Tamaño de fuente más pequeño */
 }
 
 footer span {
@@ -71,15 +63,6 @@ option :hover {
   color: inherit; /* Inherits the button's text color */
 }
 
-/* Estilo base para el contenido de la página */
-body,
-html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: Arial, sans-serif;
-}
-
 /* Contenedor de cuadrícula que se adapta */
 .container {
   display: grid;
@@ -101,4 +84,9 @@ html {
     grid-template-columns: 1fr; /* Solo una columna en pantallas pequeñas */
     padding: 10px;
   }
+}
+.separador {
+  /* vamos a agregar una linea negra para cada vez que llega un mensaje para diferenciarlos*/
+  border-bottom: 1px solid black;
+  margin-bottom: 10px;
 }

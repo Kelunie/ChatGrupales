@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="codes/css/stilos.css" />
 <link rel="stylesheet" href="codes/css/bootstrap.min.css" />
 <!-- CSS de Bootstrap -->
-<link rel="stylesheet" href="codes/css/stilos.css" />
+<link rel="stylesheet" href="../ChatGrupales/codes/css/stilos.css" />
 <!-- Tu CSS personalizado -->
 
 <!-- boostrap https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css -->
