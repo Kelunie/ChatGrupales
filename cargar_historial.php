@@ -3,7 +3,7 @@ include_once('codes/conexion.inc');
 
 $chat_grupo = $_GET['chat_grupo'];
 
-$query = "SELECT nombre_usuario, mensaje, DATE_FORMAT(fecha, '%d-%m-%Y %H:%i:%s') as fecha FROM mensajes WHERE chat_grupo = ? ORDER BY fecha DESC";
+$query = "SELECT nombre_usuario, mensaje, DATE_FORMAT(fecha, '%d-%m-%Y %H:%i') as fecha FROM mensajes WHERE chat_grupo = ? ORDER BY DATE(fecha) DESC, TIME(fecha) ASC";
 $stmt = $conex->prepare($query);
 $stmt->bind_param("s", $chat_grupo);
 $stmt->execute();
