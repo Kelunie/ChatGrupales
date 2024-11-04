@@ -1,10 +1,17 @@
 <?php
+session_start();
 include_once('codes/conexion.inc');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_SESSION['tecnico'])) {
+        $nombre_usuario = $_SESSION['username'];
+        $mensaje = $_POST['mensaje'];
+        $chat_grupo = $_POST['chat_grupo'];
+    } else {
     $nombre_usuario = $_POST['nombre_usuario'];
     $mensaje = $_POST['mensaje'];
     $chat_grupo = $_POST['chat_grupo'];
+    }
 
     $query = "INSERT INTO mensajes (nombre_usuario, mensaje, chat_grupo) VALUES (?, ?, ?)";
     $stmt = $conex->prepare($query);
