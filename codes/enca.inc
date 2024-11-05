@@ -42,6 +42,8 @@ if ($page == "gestionar_tickets.php") {
 } elseif ($page == "chat_ticket.php" && isset($_GET['ticket_id'])) {
     $ticketId = htmlspecialchars($_GET['ticket_id']); // Sanitiza el ID del ticket para seguridad
     echo "<title>Soporte</title>";
+} elseif ($page == "crear_tecnico.php"){
+  echo "<title> Creación de Usuarios</title>";
 } else {
     echo "<title>Chat Grupales CCSS</title>";
 }
