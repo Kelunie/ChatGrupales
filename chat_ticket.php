@@ -245,6 +245,24 @@ $tecnicoAsignado = $ticket['tecnico_asignado']; // ID del técnico asignado al t
                                 console.error('Error:', error);
                             });
                     });
+                    // Mostrar un mensaje de confirmación al intentar cerrar la ventana o navegar a otra página
+                    window.onbeforeunload = function(event) {
+                        // Configurar el mensaje de advertencia
+                        const message =
+                            "¿Estás seguro de querer salir? \n si lo hace no podras volver al chat, y tendra que abrir otro.";
+                        event.returnValue = message; // Para algunos navegadores
+                        return message; // Para otros navegadores
+                    };
+
+                    // Limpiar la sesión al cerrar la ventana
+                    window.addEventListener('beforeunload', function() {
+                        fetch('cerrar_chat.php') // Llama al archivo PHP para limpiar la sesión
+                            .then(response => {
+                                if (!response.ok) {
+                                    console.error('Error al limpiar la sesión.');
+                                }
+                            });
+                    });
                 </script>
             </header>
         </div>

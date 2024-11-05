@@ -133,19 +133,16 @@
                 <button type="button" class="btn btn-info"><a href="gestionar_tickets.php">Getionar Tickets
                         Usuario</a></button>
             </div>
-
         <?php endif; ?>
 
 
     </header>
-    <!-- si inicio sesion como tecnico no se muestra el boton -->
-    <!-- Botón para iniciar sesión como técnico -->
+    <!-- redirige a index.php si no esta login -->
     <?php if (!isset($_SESSION['tecnico'])) : ?>
-        <div class="container text-center mt-4">
-            <button type="button" class="mi-btn2" data-bs-toggle="modal" data-bs-target="#loginModal">
-                Iniciar sesión como Técnico
-            </button>
-        </div>
+        <script>
+            alert('Debe iniciar sesión como técnico para acceder a esta página.');
+            window.location.href = 'index.php';
+        </script>
     <?php endif; ?>
 
     <main>
@@ -155,10 +152,12 @@
 
         <div class="container mt-4 text-center">
             <form id="formUsuario" action="index.php" method="POST">
-                <input type="text" id="nombreUsuarioPrincipal" name="nombreUsuario" placeholder="Tu nombre" required>
-
+                <h2 style="color: gold;"> <?php echo $_SESSION['username']; ?></h2>
+                <input type="text" id="nombreUsuarioPrincipal" name="nombreUsuario"
+                    value="<?php echo $_SESSION['username']; ?>" readonly required hidden>
             </form>
         </div>
+        <br>
 
         <div class="container mt-4 text-center">
             <select id="chatSelect" class="form-select form-select-lg m-auto order-2" aria-label="Large select">
@@ -174,66 +173,9 @@
                 <option value="Preconsulta">Preconsulta</option>
                 <option value="Redes">Redes</option>
             </select>
-
             <button type="button" id="openModalBtn" class="mi-boton btn btn-gold mt-4">Ingresar al chat</button>
         </div>
-        <?php if (!isset($_SESSION['tecnico'])) : ?>
-            <!-- Botón para enviar un ticket de soporte -->
-            <div class="container mt-4 text-center">
-                <button type="button" id="openTicketBtn" class="btn btn-info">Enviar Ticket de Soporte</button>
-            </div>
-
-            <!-- Modal para enviar ticket de soporte -->
-            <div id="ticketModal" class="modal fade" tabindex="-1" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Enviar Ticket de Soporte</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="formEnviarTicket">
-                                <div class="mb-3">
-                                    <input type="text" class="form-control" id="nombreUsuario" name="nombreUsuario"
-                                        placeholder="Tu nombre" required>
-                                </div>
-                                <div class="mb-3">
-                                    <textarea class="form-control" id="mensajeTicket" name="mensajeTicket" rows="3"
-                                        placeholder="Describe tu problema..." required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Enviar Ticket</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php endif; ?>
         <br>
-
-        <!-- Modal para iniciar sesión como Técnico -->
-        <div id="loginModal" class="modal fade" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Iniciar sesión</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="formLogin" method="POST">
-                            <div class="mb-3">
-                                <input type="text" class="form-control" id="username" name="username"
-                                    placeholder="Usuario" required>
-                            </div>
-                            <div class="mb-3">
-                                <input type="password" class="form-control" id="password" name="password"
-                                    placeholder="Contraseña" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Iniciar sesión</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Modal para el chat seleccionado -->
         <div id="chatModal" class="modal fade" tabindex="-1" role="dialog">
@@ -274,48 +216,10 @@
         <script src="codes/js/bootstrap.bundle.min.js"></script>
 
         <script>
-            // Llamada AJAX para iniciar sesión como técnico
-            document.getElementById('formLogin').addEventListener('submit', function(e) {
-                e.preventDefault(); // Prevenir el envío normal del formulario
-
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-
-                fetch('login_tecnico.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Redirigir a la página de gestión de tickets
-                            window.location.href = data.redirect;
-                        } else {
-                            alert(data.message); // Mostrar mensaje de error
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            });
-
-            // Validar si el nombre de usuario está ingresado y cumple con el mínimo de caracteres
+            // Validar si el nombre de usuario está ingresado
             function validarNombreUsuario() {
-                var nombreUsuario = document.getElementById("nombreUsuarioPrincipal").value.trim();
-
-                // Definir un mínimo de caracteres para un nombre y apellido combinados
-                var minimoCaracteres = 8;
-
-                // Verificar que el nombre ingresado tenga al menos 8 caracteres en total
-                if (nombreUsuario.length >= minimoCaracteres) {
-                    return true;
-                } else {
-                    alert("Por favor, ingresa al menos un nombre y un apellido.");
-                    return false;
-                }
+                var nombreUsuario = document.getElementById("nombreUsuarioPrincipal").value;
+                return nombreUsuario.trim() !== ""; // Devuelve true si hay nombre ingresado
             }
 
             // Abrir el chat y cargar el historial de mensajes
@@ -353,47 +257,6 @@
                     });
             }
 
-            // Abrir el modal de enviar ticket de soporte
-            document.getElementById('openTicketBtn').addEventListener('click', function() {
-                var ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
-                ticketModal.show();
-            });
-
-            // Manejar el envío del formulario para el ticket
-            document.getElementById('formEnviarTicket').addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const nombreUsuario = document.getElementById('nombreUsuario').value;
-                const mensajeTicket = document.getElementById('mensajeTicket').value;
-
-                // Obtener IP del usuario
-                const ipUsuario = '<?php echo $_SERVER["REMOTE_ADDR"]; ?>';
-                const nombreEquipo = window.navigator.userAgent;
-
-                fetch('crear_ticket.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: `nombre_usuario=${encodeURIComponent(nombreUsuario)}&mensaje=${encodeURIComponent(mensajeTicket)}&ip_usuario=${encodeURIComponent(ipUsuario)}&nombre_equipo=${encodeURIComponent(nombreEquipo)}`
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Abrir una nueva pestaña con el chat del ticket
-                            const nuevaVentana = window.open('chat_ticket.php?ticket_id=' + data.ticket_id,
-                                '_blank');
-                            // Limpiar los campos del formulario
-                            document.getElementById('nombreUsuario').value = '';
-                            document.getElementById('mensajeTicket').value = '';
-                        } else {
-                            alert('Hubo un problema al enviar el ticket: ' + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            });
             // Manejar el envío del formulario para enviar mensajes
             document.getElementById('formEnviarMensaje').addEventListener('submit', function(e) {
                 e.preventDefault(); // Prevenir el envío normal del formulario
