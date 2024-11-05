@@ -23,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Mensaje de error si no se realizó la actualización
         echo "No se pudo cerrar el ticket o el estado no era 'en proceso'.";
+        usleep(2000000);
+        header("Location: gestionar_tickets.php");
     }
 
     $stmt->close();
