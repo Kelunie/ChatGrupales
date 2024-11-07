@@ -7,11 +7,12 @@ if (!isset($_SESSION['tecnico'])) {
 
 include_once('codes/conexion.inc');
 
+
 // Consulta para obtener los tickets abiertos con el nombre de usuario del técnico asignado
-$query = "SELECT tickets.id, tickets.nombre_usuario, tickets.mensaje, tickets.estado, tickets.fecha, 
-                 tickets.ip_usuario, tickets.nombre_equipo, tecnicos.username AS tecnico_asignado
-          FROM tickets 
-          LEFT JOIN tecnicos ON tickets.tecnico_asignado = tecnicos.id";
+$query = "SELECT tickets.id, tickets.nombre_usuario, tickets.mensaje, tickets.estado, tickets.fecha,
+tickets.ip_usuario, tickets.nombre_equipo, tecnicos.username AS tecnico_asignado
+FROM tickets
+LEFT JOIN tecnicos ON tickets.tecnico_asignado = tecnicos.id";
 
 $result = $conex->query($query);
 ?>
@@ -23,6 +24,11 @@ $result = $conex->query($query);
     <?php include_once('codes/enca.inc'); ?>
     <title>Gestión de Tickets</title>
     <link rel="stylesheet" href="codes/css/bootstrap.min.css" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         .btn-warning a {
             text-decoration: none;
@@ -163,6 +169,7 @@ $result = $conex->query($query);
         }
         */
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
@@ -177,17 +184,18 @@ $result = $conex->query($query);
     </header>
 
     <main>
-        <div class="container-md">
+        <div class="container-fluid">
             <h1 style="color: gold;">Tickets de Soporte</h1>
 
-            <div class="table-responsive tablitadinamica" style="max-height: auto; overflow-y: auto;">
+            <div class="table-responsive tablitadinamica"
+                style="max-height: 500px; overflow-y: 5000px; max-width: 10000px">
                 <?php if ($result->num_rows > 0): ?>
                     <table class="display" id="tablaTickets">
                         <thead>
                             <tr>
                                 <th class="filitas">ID</th>
                                 <th class="filitas">Activo (IP)</th>
-                                <th class="filitas">Mensaje</th>
+                                <th class="filitas">Usuario</th>
                                 <th class="filitas">Estado</th>
                                 <th class="filitas">Fecha</th>
                                 <th class="filitas">Técnico Asignado</th>
@@ -201,7 +209,7 @@ $result = $conex->query($query);
                                     <td class="filitas">
                                         <?= (!empty($row['nombre_equipo']) ? $row['nombre_equipo'] : 'Desconocido') . " (" . (!empty($row['ip_usuario']) ? $row['ip_usuario'] : 'IP desconocida') . ")" ?>
                                     </td>
-                                    <td class="filitas"><?= $row['mensaje'] ?></td>
+                                    <td class="filitas"><?= $row['nombre_usuario'] ?></td>
                                     <td class="filitas"><?= $row['estado'] ?></td>
                                     <td class="filitas"><?= $row['fecha'] ?></td>
                                     <td class="filitas"><?= $row['tecnico_asignado'] ?: 'Sin asignar' ?></td>
@@ -218,6 +226,10 @@ $result = $conex->query($query);
                                         <?php endif; ?>
                                         <a href="chat_ticket.php?ticket_id=<?= $row['id'] ?>" target="_blank"
                                             class="btn btn-info">Ver Chat</a>
+                                        <button class="btn btn-gold info-btn" data-id="<?php echo $row['id']; ?>">
+                                            <i class="fa-regular fa-address-card" alt="Detalles"></i>
+                                        </button>
+
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
@@ -227,6 +239,25 @@ $result = $conex->query($query);
                     <p>No hay tickets abiertos.</p>
                 <?php endif; ?>
             </div>
+            <!-- Modal -->
+            <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="infoModalLabel">Ticket Information</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Aquí se cargará la información del ticket -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
     </main>
 
@@ -264,6 +295,10 @@ $result = $conex->query($query);
                                         <button type="submit" class="btn btn-primary">Aceptar Ticket</button>
                                     </form>` : `<button class="btn btn-secondary" disabled>Aceptar Ticket</button>`}
                                     <a href="chat_ticket.php?ticket_id=${ticket.id}" target="_blank" class="btn btn-info">Ver Chat</a>
+                                    <button class="btn btn-gold info-btn" data-id="${ticket.id}"; ?>">
+    <i class="fa-regular fa-address-card" alt="Detalles"></i>
+</button>
+
                                 </td>
                             `;
                             tabla.appendChild(fila);
@@ -304,7 +339,46 @@ $result = $conex->query($query);
                 });
             });
         });
+
+        $(document).ready(function() {
+            $(document).on('click', '.info-btn', function() {
+                const ticketId = $(this).data('id');
+
+                $.ajax({
+                    url: 'detalles_ticket.php',
+                    method: 'POST',
+                    data: {
+                        ticket_id: ticketId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.error) {
+                            $('#infoModal .modal-body').html('<p>Error: ' + data.error +
+                                '</p>');
+                        } else {
+                            $('#infoModal .modal-body').html(`
+                        <p><strong>ID:</strong> ${data.id}</p>
+                        <p><strong>Equipo:</strong> ${data.nombre_equipo || 'Desconocido'}</p>
+                        <p><strong>IP:</strong> ${data.ip_usuario || 'IP desconocida'}</p>
+                        <p><strong>Usuario:</strong> ${data.nombre_usuario}</p>
+                        <p><strong>Estado:</strong> ${data.estado}</p>
+                        <p><strong>Fecha:</strong> ${data.fecha}</p>
+                        <p><strong>Técnico Asignado:</strong> ${data.tecnico_asignado || 'Sin asignar'}</p>
+                        <p><strong>Mensaje:</strong> ${data.mensaje}</p>
+                    `);
+                        }
+                        $('#infoModal').modal('show');
+                    },
+                    error: function() {
+                        alert('Error al obtener los detalles del ticket.');
+                    }
+                });
+            });
+        });
     </script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>
